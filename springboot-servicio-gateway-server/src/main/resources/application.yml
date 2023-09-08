@@ -1,0 +1,49 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: servicio-productos
+        uri: lb://servicio-productos
+        predicates:
+          - Path=/api/productos/**
+        filters:
+#          - CircuitBreaker=products
+          - name: CircuitBreaker
+            args:
+              name: products
+              statusCodes: 500
+              fallbackUri: forward:/api/items/ver/9/cantidad/5
+          - StripPrefix=2
+          - EjemploCookie=Hola mi mensaje personalizado, usuario, AndresGuzman
+      - id: servicio-items
+        uri: lb://servicio-items
+        predicates:
+          - Path=/api/items/**
+        filters:
+          - StripPrefix=2
+          - AddRequestHeader=token-request, 123456
+          - AddResponseHeader=token-response, 12345678
+#          - SetResponseHeader=Content-Type, text/plain
+          - AddRequestParameter=nombre, andres
+
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 6
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 5
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+    products:
+      items:
+        base-config: default
+  timelimiter:
+    configs:
+      default:
+        timeout-duration: 2s
+    products:
+      items:
+        base-config: default
