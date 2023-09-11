@@ -1,5 +1,5 @@
-INSERT INTO `users` (username, password, enabled, firstname, lastname, email) VALUES ('marco', '12345', 1, 'Marco', 'Cubas', 'marcocubas@gmail.com');
-INSERT INTO `users` (username, password, enabled, firstname, lastname, email) VALUES ('admin', '12345', 1, 'Jhon ', 'Doe', 'jhon.doe@gmail.com');
+INSERT INTO `users` (username, password, enabled, firstname, lastname, email) VALUES ('marco', '$2a$10$YvXIGEu6DhzSxnW0lS8m7uY97jNUKKe5hSD.QgdXx6TLvKdVm5kXS', 1, 'Marco', 'Cubas', 'marcocubas@gmail.com');
+INSERT INTO `users` (username, password, enabled, firstname, lastname, email) VALUES ('admin', '$2a$10$YvXIGEu6DhzSxnW0lS8m7uY97jNUKKe5hSD.QgdXx6TLvKdVm5kXS', 1, 'Jhon ', 'Doe', 'jhon.doe@gmail.com');
 
 INSERT INTO `roles` (name) VALUES ('ROLE_USER');
 INSERT INTO `roles` (name) VALUES ('ROLE_ADMIN');
