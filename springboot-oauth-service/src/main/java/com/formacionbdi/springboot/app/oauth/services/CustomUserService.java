@@ -2,6 +2,7 @@ package com.formacionbdi.springboot.app.oauth.services;
 
 import com.formacionbdi.springboot.app.commons.users.models.entity.CustomUser;
 import com.formacionbdi.springboot.app.oauth.clients.UserFeignClient;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,28 +28,35 @@ public class CustomUserService implements UserDetailsService, ICustomUserService
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        CustomUser user = client.findByUsername(username);
+        try {
+            CustomUser user = client.findByUsername(username);
 
-        if (user == null) {
+            log.info("Authenticated user: " + username);
+
+            List<GrantedAuthority> authorities = user.getRoles().stream()
+                    .map(role -> new SimpleGrantedAuthority(role.getName()))
+                    .peek(authority -> log.info("Role: " + authority.getAuthority()))
+                    .collect(Collectors.toList());
+
+            return new User(user.getUsername(), user.getPassword(), user.getEnabled(),
+                    true, true, true, authorities);
+
+        } catch (FeignException e) {
             String msg = String.format("Error in login, user %s not found.", username);
+
             log.error(msg);
             throw new UsernameNotFoundException(msg);
         }
-
-        log.info("Authenticated user: " + username);
-
-        List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
-                .peek(authority -> log.info("Role: " + authority.getAuthority()))
-                .collect(Collectors.toList());
-
-        return new User(user.getUsername(), user.getPassword(), user.getEnabled(),
-                true, true, true, authorities);
     }
 
     @Override
     public CustomUser findByUsername(String username) {
         return client.findByUsername(username);
+    }
+
+    @Override
+    public CustomUser update(Long id, CustomUser user) {
+        return client.update(id, user);
     }
 
 }

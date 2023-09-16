@@ -45,4 +45,6 @@ public class CustomUser {
     @Column(unique = true)
     private String email;
 
+    private Integer tries;
+
 }
